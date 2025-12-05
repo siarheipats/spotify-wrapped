@@ -4,26 +4,16 @@ import type { StreamRecord } from "./spotifyTypes";
 import JSZip from "jszip";
 import { computeBasicStats, computeTopArtists, computeListeningHabits, computeTopTracks, computePersonality, computeEras, computeMilestones, computeBadges } from "./stats";
 
-import {
-  Box,
-  Container,
-  Typography,
-  Paper,
-  Grid,
-  Chip,
-  Alert,
-  List,
-  ListItem,
-  ListItemText,
-  Card,
-  CardContent,
-} from "@mui/material";
+import { Box, Container, Typography, Grid, Alert } from "@mui/material";
 
-import { ListeningTimelineChart } from "./components/ListeningTimelineChart";
-import { TopArtistsChart } from "./components/TopArtistsChart";
-import { ListeningByHourChart } from "./components/ListeningByHourChart";
-import { ListeningByWeekdayChart } from "./components/ListeningByWeekdayChart";
-import { TopTracksChart } from "./components/TopTracksChart";
+import { ListeningTimelineSection } from "./components/ListeningTimelineSection";
+import { TopArtistsSection } from "./components/TopArtistsSection";
+import { HabitsSection } from "./components/HabitsSection";
+import { TopTracksSection } from "./components/TopTracksSection";
+import { DropZone } from "./components/DropZone";
+import { PersonalitySummaryCard } from "./components/PersonalitySummaryCard";
+import { StatCardsRow } from "./components/StatCardsRow";
+import { DataLoadedPanel } from "./components/DataLoadedPanel";
 import { StoryHighlights } from "./components/StoryHighlights";
 
 function App() {
@@ -109,17 +99,8 @@ function App() {
     event.preventDefault();
   };
 
-  const handleDrop = async (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    await parseFiles(Array.from(event.dataTransfer.files));
-  };
-
-  const handleFileInputChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    if (!event.target.files) return;
-    await parseFiles(Array.from(event.target.files));
-    event.target.value = "";
+  const handleFilesPicked = async (files: File[]) => {
+    await parseFiles(files);
   };
 
   return (
@@ -144,45 +125,7 @@ function App() {
         </Box>
 
         {/* Drop zone */}
-        <Paper
-          variant="outlined"
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}
-          onClick={() => {
-            const input = document.getElementById(
-              "file-input",
-            ) as HTMLInputElement | null;
-            input?.click();
-          }}
-          sx={{
-            borderStyle: "dashed",
-            borderColor: "primary.main",
-            borderRadius: 4,
-            py: 6,
-            px: 3,
-            textAlign: "center",
-            cursor: "pointer",
-            background:
-              "radial-gradient(circle at top, rgba(29,185,84,0.25), transparent 55%)",
-            mb: 4,
-          }}
-        >
-          <Typography variant="h6" gutterBottom>
-            Drop JSON or ZIP files here
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            or click to browse your files
-          </Typography>
-
-          <input
-            id="file-input"
-            type="file"
-            accept=".json,.zip"
-            multiple
-            onChange={handleFileInputChange}
-            style={{ display: "none" }}
-          />
-        </Paper>
+        <DropZone onFilesPicked={handleFilesPicked} onDragOver={handleDragOver} />
 
         {error && (
           <Box mb={3}>
@@ -194,146 +137,30 @@ function App() {
         {stats.totalStreams > 0 && (
           <>
             {/* Personality summary */}
-            {personality && (
-              <Box mb={3}>
-                <Paper sx={{ p: 2.5, borderRadius: 3 }}>
-                  <Typography variant="overline" color="text.secondary">
-                    Your listening personality
-                  </Typography>
-                  <Typography variant="h5" fontWeight={700} gutterBottom>
-                    {personality.title}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    mb={2}
-                  >
-                    {personality.tagline}
-                  </Typography>
-
-                  <Box
-                    display="flex"
-                    flexWrap="wrap"
-                    gap={1}
-                    mb={1.5}
-                  >
-                    {personality.traits.map((trait) => (
-                      <Chip
-                        key={trait.id}
-                        label={trait.label}
-                        color="primary"
-                        variant="outlined"
-                        size="small"
-                      />
-                    ))}
-                  </Box>
-
-                  <Box component="ul" sx={{ pl: 3, m: 0 }}>
-                    {personality.traits.map((trait) => (
-                      <li key={trait.id}>
-                        <Typography variant="body2">
-                          <strong>{trait.label}:</strong> {trait.description}
-                        </Typography>
-                      </li>
-                    ))}
-                  </Box>
-                </Paper>
-              </Box>
-            )}
+            {personality && <PersonalitySummaryCard personality={personality} />}
             {/* Top stats row */}
-            <Grid container spacing={2} mb={3}>
-              <Grid item xs={12} md={3}>
-                <StatCard
-                  label="Total listening time"
-                  value={`${stats.totalDays.toFixed(1)} days`}
-                  subtitle={`${stats.totalHours.toFixed(1)} hours`}
-                />
-              </Grid>
-              <Grid item xs={12} md={3}>
-                <StatCard label="Total streams" value={stats.totalStreams} />
-              </Grid>
-              <Grid item xs={12} md={3}>
-                <StatCard
-                  label="Distinct artists"
-                  value={stats.distinctArtists}
-                />
-              </Grid>
-              <Grid item xs={12} md={3}>
-                <StatCard
-                  label="Distinct tracks"
-                  value={stats.distinctTracks}
-                />
-              </Grid>
-            </Grid>
+            <StatCardsRow
+              items={[
+                { label: "Total listening time", value: `${stats.totalDays.toFixed(1)} days`, subtitle: `${stats.totalHours.toFixed(1)} hours` },
+                { label: "Total streams", value: stats.totalStreams },
+                { label: "Distinct artists", value: stats.distinctArtists },
+                { label: "Distinct tracks", value: stats.distinctTracks },
+              ]}
+            />
 
             {/* File list + core dates */}
             <Grid container spacing={3}>
               <Grid item xs={12} md={4}>
-                <Paper sx={{ p: 2, borderRadius: 3 }}>
-                  <Typography variant="h6" gutterBottom>
-                    Data loaded
-                  </Typography>
-                  <List dense>
-                    <ListItem>
-                      <ListItemText
-                        primary="Files"
-                        secondary={
-                          filesLoaded.length > 0
-                            ? filesLoaded.join(", ")
-                            : "none"
-                        }
-                      />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText
-                        primary="First stream"
-                        secondary={stats.firstTs ?? "n/a"}
-                      />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText
-                        primary="Latest stream"
-                        secondary={stats.lastTs ?? "n/a"}
-                      />
-                    </ListItem>
-                  </List>
-                </Paper>
+                <DataLoadedPanel filesLoaded={filesLoaded} firstTs={stats.firstTs} lastTs={stats.lastTs} />
               </Grid>
 
               {/* Chart */}
               <Grid item xs={12} md={8}>
-                <Paper sx={{ p: 2.5, borderRadius: 3 }}>
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="space-between"
-                    mb={1}
-                  >
-                    <Typography variant="h6">
-                      Listening over the years
-                    </Typography>
-                    {stats.listeningByYear.length > 0 && (
-                      <Chip
-                        size="small"
-                        label={`From ${stats.listeningByYear[0].year} to ${
-                          stats.listeningByYear[
-                            stats.listeningByYear.length - 1
-                          ].year
-                        }`}
-                        color="primary"
-                        variant="outlined"
-                      />
-                    )}
-                  </Box>
-                  <Typography variant="body2" color="text.secondary" mb={2}>
-                    Hours listened per year, based on your streaming history.
-                  </Typography>
-                  <ListeningTimelineChart data={stats.listeningByYear} />
-                </Paper>
+                <ListeningTimelineSection data={stats.listeningByYear} />
               </Grid>
             </Grid>
             <br/>
-            
+
             {/* Storytelling: eras, milestones, badges */}
             {(eras.length > 0 || milestones.length > 0 || badges.length > 0) && (
               <Box mb={3}>
@@ -345,101 +172,23 @@ function App() {
             {topArtists.length > 0 && (
               <Grid container spacing={3}>
                 <Grid item xs={12}>
-                  <Paper sx={{ p: 2.5, borderRadius: 3 }}>
-                    <Box
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="space-between"
-                      mb={1}
-                    >
-                      <Typography variant="h6">
-                        Top artists by listening time
-                      </Typography>
-                      <Chip
-                        size="small"
-                        label={`${topArtists.length} artists shown`}
-                        color="primary"
-                        variant="outlined"
-                      />
-                    </Box>
-                    <Typography variant="body2" color="text.secondary" mb={2}>
-                      Total hours listened for each artist, across your entire
-                      Spotify history.
-                    </Typography>
-                    <TopArtistsChart data={topArtists} />
-                  </Paper>
+                  <TopArtistsSection data={topArtists} />
                 </Grid>
               </Grid>
             )}
             <br/>
+
             {/* Listening habits */}
             {(habits.byHour.length > 0 || habits.byWeekday.length > 0) && (
-              <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
-                  <Paper sx={{ p: 2.5, borderRadius: 3, height: "100%" }}>
-                    <Typography variant="h6" gutterBottom>
-                      Listening by hour of day (UTC)
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      mb={2}
-                    >
-                      See which times of day you tend to listen the most.
-                      (Currently using UTC; later we can shift to your timezone.)
-                    </Typography>
-                    <ListeningByHourChart data={habits.byHour} />
-                  </Paper>
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <Paper sx={{ p: 2.5, borderRadius: 3, height: "100%" }}>
-                    <Typography variant="h6" gutterBottom>
-                      Listening by weekday
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      mb={2}
-                    >
-                      Total hours listened on each day of the week.
-                    </Typography>
-                    <ListeningByWeekdayChart data={habits.byWeekday} />
-                  </Paper>
-                </Grid>
-              </Grid>
+              <HabitsSection byHour={habits.byHour} byWeekday={habits.byWeekday} />
             )}
             <br/>
+
             {topTracks.length > 0 && (
-                  <Grid item xs={12} md={6}>
-                    <Paper sx={{ p: 2.5, borderRadius: 3, height: "100%" }}>
-                      <Box
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="space-between"
-                        mb={1}
-                      >
-                        <Typography variant="h6">
-                          Top tracks by listening time
-                        </Typography>
-                        <Chip
-                          size="small"
-                          label={`${topTracks.length} tracks shown`}
-                          color="primary"
-                          variant="outlined"
-                        />
-                      </Box>
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        mb={2}
-                      >
-                        Your most-played songs over your entire Spotify
-                        history.
-                      </Typography>
-                      <TopTracksChart data={topTracks} />
-                    </Paper>
-                  </Grid>
-                )}
+              <Grid item xs={12} md={6}>
+                <TopTracksSection data={topTracks} />
+              </Grid>
+            )}
           </>
         )}
 
@@ -455,37 +204,6 @@ function App() {
         )}
       </Container>
     </Box>
-  );
-}
-
-interface StatCardProps {
-  label: string;
-  value: string | number;
-  subtitle?: string;
-}
-
-function StatCard({ label, value, subtitle }: StatCardProps) {
-  return (
-    <Card
-      sx={{
-        borderRadius: 3,
-        height: "100%",
-      }}
-    >
-      <CardContent>
-        <Typography variant="overline" color="text.secondary">
-          {label}
-        </Typography>
-        <Typography variant="h5" fontWeight={700}>
-          {value}
-        </Typography>
-        {subtitle && (
-          <Typography variant="body2" color="text.secondary">
-            {subtitle}
-          </Typography>
-        )}
-      </CardContent>
-    </Card>
   );
 }
 
