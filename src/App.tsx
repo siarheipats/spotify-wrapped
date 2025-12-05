@@ -14,6 +14,10 @@ import { DropZone } from "./components/DropZone";
 import { PersonalitySummaryCard } from "./components/PersonalitySummaryCard";
 import { StatCardsRow } from "./components/StatCardsRow";
 import { DataLoadedPanel } from "./components/DataLoadedPanel";
+import { PodcastInsightsSection } from "./components/PodcastInsightsSection";
+import { SkippingInsightsSection } from "./components/SkippingInsightsSection";
+import { SessionInsightsSection } from "./components/SessionInsightsSection";
+import { computeMusicPodcastSplit, computeTopPodcastShows, computeTopPodcastEpisodes, computeSkipping, computeSessions } from "./analytics";
 import { StoryHighlights } from "./components/StoryHighlights";
 
 function App() {
@@ -29,6 +33,11 @@ function App() {
   const eras = stats.totalStreams > 0 ? computeEras(stats, streams) : [];
   const milestones = stats.totalStreams > 0 ? computeMilestones(stats, streams) : [];
   const badges = stats.totalStreams > 0 ? computeBadges(streams) : [];
+  const podcastSplit = computeMusicPodcastSplit(streams);
+  const topPodcastShows = computeTopPodcastShows(streams, 8);
+  const topPodcastEpisodes = computeTopPodcastEpisodes(streams, 8);
+  const skipping = computeSkipping(streams);
+  const sessionStats = computeSessions(streams, 30);
 
   const parseFiles = async (files: File[]) => {
     setError(null);
@@ -167,6 +176,21 @@ function App() {
                 <StoryHighlights eras={eras} milestones={milestones} badges={badges} />
               </Box>
             )}
+
+            {/* Podcast insights */}
+            <Box mb={3}>
+              <PodcastInsightsSection split={podcastSplit} topShows={topPodcastShows} topEpisodes={topPodcastEpisodes} />
+            </Box>
+
+            {/* Skipping behavior */}
+            <Box mb={3}>
+              <SkippingInsightsSection skipping={skipping} />
+            </Box>
+
+            {/* Session analysis */}
+            <Box mb={3}>
+              <SessionInsightsSection stats={sessionStats} />
+            </Box>
 
             {/* Top Artists */}
             {topArtists.length > 0 && (
