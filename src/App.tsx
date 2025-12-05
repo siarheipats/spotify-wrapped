@@ -1,6 +1,7 @@
 // src/App.tsx
 import { useState } from "react";
 import type { StreamRecord } from "./spotifyTypes";
+import JSZip from "jszip";
 import { computeBasicStats, computeTopArtists, computeListeningHabits, computeTopTracks, computePersonality } from "./stats";
 
 import {
@@ -38,7 +39,30 @@ function App() {
   const parseFiles = async (files: File[]) => {
     setError(null);
 
-    const jsonFiles = files.filter((file) =>
+    // Expand ZIP files into JSON files
+    const expandedFiles: File[] = [];
+    for (const file of files) {
+      const lower = file.name.toLowerCase();
+      if (lower.endsWith(".zip")) {
+        try {
+          const zip = await JSZip.loadAsync(file);
+          const entries = Object.values(zip.files).filter((f) => !f.dir && f.name.toLowerCase().endsWith(".json"));
+          for (const entry of entries) {
+            const content = await entry.async("string");
+            const blob = new Blob([content], { type: "application/json" });
+            const jsonFile = new File([blob], entry.name, { type: "application/json" });
+            expandedFiles.push(jsonFile);
+          }
+        } catch (e) {
+          console.error(e);
+          setError("Failed to read ZIP file. Ensure it contains JSON files.");
+        }
+      } else {
+        expandedFiles.push(file);
+      }
+    }
+
+    const jsonFiles = expandedFiles.filter((file) =>
       file.name.toLowerCase().endsWith(".json"),
     );
 
@@ -140,7 +164,7 @@ function App() {
           }}
         >
           <Typography variant="h6" gutterBottom>
-            Drop JSON files here
+            Drop JSON or ZIP files here
           </Typography>
           <Typography variant="body2" color="text.secondary">
             or click to browse your files
@@ -149,7 +173,7 @@ function App() {
           <input
             id="file-input"
             type="file"
-            accept=".json"
+            accept=".json,.zip"
             multiple
             onChange={handleFileInputChange}
             style={{ display: "none" }}
