@@ -2,7 +2,7 @@
 import { useState } from "react";
 import type { StreamRecord } from "./spotifyTypes";
 import JSZip from "jszip";
-import { computeBasicStats, computeTopArtists, computeListeningHabits, computeTopTracks, computePersonality } from "./stats";
+import { computeBasicStats, computeTopArtists, computeListeningHabits, computeTopTracks, computePersonality, computeEras, computeMilestones, computeBadges } from "./stats";
 
 import {
   Box,
@@ -24,6 +24,7 @@ import { TopArtistsChart } from "./components/TopArtistsChart";
 import { ListeningByHourChart } from "./components/ListeningByHourChart";
 import { ListeningByWeekdayChart } from "./components/ListeningByWeekdayChart";
 import { TopTracksChart } from "./components/TopTracksChart";
+import { StoryHighlights } from "./components/StoryHighlights";
 
 function App() {
   const [streams, setStreams] = useState<StreamRecord[]>([]);
@@ -35,6 +36,9 @@ function App() {
   const habits = computeListeningHabits(streams);
   const topTracks = computeTopTracks(streams, 10);
   const personality = stats.totalStreams > 0 ? computePersonality(stats, habits, topArtists) : null;
+  const eras = stats.totalStreams > 0 ? computeEras(stats, streams) : [];
+  const milestones = stats.totalStreams > 0 ? computeMilestones(stats, streams) : [];
+  const badges = stats.totalStreams > 0 ? computeBadges(streams) : [];
 
   const parseFiles = async (files: File[]) => {
     setError(null);
@@ -330,6 +334,13 @@ function App() {
             </Grid>
             <br/>
             
+            {/* Storytelling: eras, milestones, badges */}
+            {(eras.length > 0 || milestones.length > 0 || badges.length > 0) && (
+              <Box mb={3}>
+                <StoryHighlights eras={eras} milestones={milestones} badges={badges} />
+              </Box>
+            )}
+
             {/* Top Artists */}
             {topArtists.length > 0 && (
               <Grid container spacing={3}>
