@@ -18,6 +18,7 @@ import { PodcastInsightsSection } from "./components/PodcastInsightsSection";
 import { SkippingInsightsSection } from "./components/SkippingInsightsSection";
 import { SessionInsightsSection } from "./components/SessionInsightsSection";
 import { ArtistTrackInsightsSection } from "./components/ArtistTrackInsightsSection";
+import AIReportSection from "./components/AIReportSection";
 import { computeMusicPodcastSplit, computeTopPodcastShows, computeTopPodcastEpisodes, computeSkipping, computeSessions, computeForeverTop10, computeRepeatChampions, computeGhostedArtists, computeClimbers, computeFrozenTracks } from "./analytics";
 import { StoryHighlights } from "./components/StoryHighlights";
 
@@ -184,6 +185,12 @@ function App() {
               </Grid>
             </Grid>
             <br/>
+            {/* AI Personality Report */}
+            {(topArtists.length > 0 || topTracks.length > 0) && (
+              <Box mb={3}>
+                <AIReportSection stats={stats} habits={habits} topArtists={topArtists} topTracks={topTracks} />
+              </Box>
+            )}
 
             {/* Storytelling: eras, milestones, badges */}
             {(eras.length > 0 || milestones.length > 0 || badges.length > 0) && (

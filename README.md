@@ -37,3 +37,16 @@ A Vite + React app to explore your Spotify streaming history locally in the brow
 - Live site: https://main.d16y5u8wx9p5s.amplifyapp.com/
 
 If the live site fails to update, verify the latest build succeeds and check the Amplify console for logs.
+
+## AI Personality Report (Optional)
+
+- Set an environment variable `VITE_OPENAI_API_KEY` with your OpenAI API key.
+- After loading data, click `Generate` under `AI Personality Report` in the app.
+- Requests are sent client-side via `fetch` to OpenAI's API.
+- If the key is missing, you'll see an info message and the button will be disabled.
+
+Example (PowerShell):
+
+```powershell
+$env:VITE_OPENAI_API_KEY="sk-your-key"; npm run dev
+```
