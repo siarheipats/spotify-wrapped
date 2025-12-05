@@ -259,7 +259,7 @@ export function computeRepeatChampions(streams: StreamRecord[]): RepeatChampions
 
   let maxDayPlays = 0;
   const mostPlaysInOneDayRaw: Array<{ track: string; artist: string; day: string; plays: number }> = [];
-  for (const [k, plays] of trackDayPlays.entries()) {
+  for (const plays of trackDayPlays.values()) {
     if (plays > maxDayPlays) maxDayPlays = plays;
   }
   for (const [k, plays] of trackDayPlays.entries()) {
