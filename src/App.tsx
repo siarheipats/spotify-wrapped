@@ -4,7 +4,7 @@ import type { StreamRecord } from "./spotifyTypes";
 import JSZip from "jszip";
 import { computeBasicStats, computeTopArtists, computeListeningHabits, computeTopTracks, computePersonality, computeEras, computeMilestones, computeBadges } from "./stats";
 
-import { Box, Container, Typography, Grid, Alert } from "@mui/material";
+import { Box, Container, Typography, Grid, Alert, Backdrop, CircularProgress } from "@mui/material";
 
 import { ListeningTimelineSection } from "./components/ListeningTimelineSection";
 import { TopArtistsSection } from "./components/TopArtistsSection";
@@ -25,6 +25,7 @@ function App() {
   const [streams, setStreams] = useState<StreamRecord[]>([]);
   const [filesLoaded, setFilesLoaded] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const stats = computeBasicStats(streams);
   const topArtists = computeTopArtists(streams, 10);
@@ -47,6 +48,7 @@ function App() {
 
   const parseFiles = async (files: File[]) => {
     setError(null);
+    setLoading(true);
 
     // Expand ZIP files into JSON files
     const expandedFiles: File[] = [];
@@ -107,6 +109,8 @@ function App() {
     } catch (err) {
       console.error(err);
       setError("Failed to parse one or more JSON files.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -127,6 +131,11 @@ function App() {
         py: 4,
       }}
     >
+      {/* Global loading backdrop during JSON processing */}
+      <Backdrop open={loading} sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+        <CircularProgress color="inherit" />
+        <Typography variant="body2" sx={{ ml: 2 }}>Processing your files…</Typography>
+      </Backdrop>
       <Container maxWidth="lg">
         {/* Header */}
         <Box mb={3}>
