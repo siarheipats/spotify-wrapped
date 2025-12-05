@@ -17,7 +17,8 @@ import { DataLoadedPanel } from "./components/DataLoadedPanel";
 import { PodcastInsightsSection } from "./components/PodcastInsightsSection";
 import { SkippingInsightsSection } from "./components/SkippingInsightsSection";
 import { SessionInsightsSection } from "./components/SessionInsightsSection";
-import { computeMusicPodcastSplit, computeTopPodcastShows, computeTopPodcastEpisodes, computeSkipping, computeSessions } from "./analytics";
+import { ArtistTrackInsightsSection } from "./components/ArtistTrackInsightsSection";
+import { computeMusicPodcastSplit, computeTopPodcastShows, computeTopPodcastEpisodes, computeSkipping, computeSessions, computeForeverTop10, computeRepeatChampions, computeGhostedArtists, computeClimbers, computeFrozenTracks } from "./analytics";
 import { StoryHighlights } from "./components/StoryHighlights";
 
 function App() {
@@ -38,6 +39,11 @@ function App() {
   const topPodcastEpisodes = computeTopPodcastEpisodes(streams, 8);
   const skipping = computeSkipping(streams);
   const sessionStats = computeSessions(streams, 30);
+  const foreverTop = computeForeverTop10(streams, 10);
+  const champions = computeRepeatChampions(streams);
+  const ghosted = computeGhostedArtists(streams, 2);
+  const climbers = computeClimbers(streams);
+  const frozen = computeFrozenTracks(streams);
 
   const parseFiles = async (files: File[]) => {
     setError(null);
@@ -190,6 +196,17 @@ function App() {
             {/* Session analysis */}
             <Box mb={3}>
               <SessionInsightsSection stats={sessionStats} />
+            </Box>
+
+            {/* Artist / Track Insights */}
+            <Box mb={3}>
+              <ArtistTrackInsightsSection
+                foreverTop={foreverTop}
+                champions={champions}
+                ghosted={ghosted}
+                climbers={climbers}
+                frozen={frozen}
+              />
             </Box>
 
             {/* Top Artists */}
