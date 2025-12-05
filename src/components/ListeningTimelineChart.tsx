@@ -48,7 +48,7 @@ export function ListeningTimelineChart({ data }: Props) {
           tickFormatter={(val: number) => `${val}h`}
         />
         <Tooltip
-          formatter={(value: any, name: any, props: any) => {
+          formatter={(value: any, name: any) => {
             if (name === "hours") {
               return [`${(value as number).toFixed(1)} hours`, "Listening"];
             }

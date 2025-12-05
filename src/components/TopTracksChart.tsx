@@ -56,7 +56,7 @@ export function TopTracksChart({ data }: Props) {
           width={260}
         />
         <Tooltip
-          formatter={(value: any, name: any, _props: any, index?: number) => {
+          formatter={(value: any, name: any) => {
             if (name === "hours") {
               return [`${(value as number).toFixed(2)} hours`, "Listening"];
             }
