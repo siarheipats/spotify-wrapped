@@ -211,6 +211,29 @@ function App() {
             </Grid>
             <br/>
 
+            {/* Top Artists */}
+            {topArtists.length > 0 && (
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <TopArtistsSection data={topArtists} />
+                </Grid>
+              </Grid>
+            )}
+            <br/>
+
+            {topTracks.length > 0 && (
+              <Grid item xs={12} md={6}>
+                <TopTracksSection data={topTracks} />
+              </Grid>
+            )}
+            <br/>
+
+            {/* Listening habits */}
+            {(habits.byHour.length > 0 || habits.byWeekday.length > 0) && (
+              <HabitsSection byHour={habits.byHour} byWeekday={habits.byWeekday} />
+            )}
+            <br/>
+
             {/* Storytelling: eras, milestones, badges */}
             {(eras.length > 0 || milestones.length > 0 || badges.length > 0) && (
               <Box mb={3}>
@@ -243,28 +266,6 @@ function App() {
                 frozen={frozen}
               />
             </Box>
-
-            {/* Top Artists */}
-            {topArtists.length > 0 && (
-              <Grid container spacing={3}>
-                <Grid item xs={12}>
-                  <TopArtistsSection data={topArtists} />
-                </Grid>
-              </Grid>
-            )}
-            <br/>
-
-            {/* Listening habits */}
-            {(habits.byHour.length > 0 || habits.byWeekday.length > 0) && (
-              <HabitsSection byHour={habits.byHour} byWeekday={habits.byWeekday} />
-            )}
-            <br/>
-
-            {topTracks.length > 0 && (
-              <Grid item xs={12} md={6}>
-                <TopTracksSection data={topTracks} />
-              </Grid>
-            )}
           </>
         )}
 
