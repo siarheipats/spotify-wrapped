@@ -146,6 +146,9 @@ function App() {
                 { label: "Total streams", value: stats.totalStreams },
                 { label: "Distinct artists", value: stats.distinctArtists },
                 { label: "Distinct tracks", value: stats.distinctTracks },
+                sessionStats.avgSessionMinutes !== null ? { label: "Avg session", value: `${sessionStats.avgSessionMinutes} min` } : undefined,
+                sessionStats.longestSessionMinutes !== null ? { label: "Longest session", value: `${sessionStats.longestSessionMinutes} min` } : undefined,
+                sessionStats.sessionsPerDayAvg !== null ? { label: "Sessions per day", value: sessionStats.sessionsPerDayAvg } : undefined,
                 ...(firstPlay
                   ? [
                       {
@@ -155,7 +158,7 @@ function App() {
                       },
                     ]
                   : []),
-              ]}
+              ].filter(Boolean) as any}
             />
 
             {/* AI Personality Report */}
