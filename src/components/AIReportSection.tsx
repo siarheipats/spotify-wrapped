@@ -27,15 +27,7 @@ export default function AIReportSection({ stats, habits, topArtists, topTracks }
 
   const hasKey = Boolean(import.meta.env.VITE_OPENAI_API_KEY);
 
-  const buildSystemPrompt = () => {
-    const focusList = [
-      ...(focusArtists ? ["artists"] : []),
-      ...(focusTracks ? ["tracks"] : []),
-      ...(focusHabits ? ["habits"] : []),
-    ];
-    const focusStr = focusList.length ? focusList.join(", ") : "overall stats";
-    return `You are a friendly music analyst with a ${tone} voice. Make it super interesting, engaging, and funny. Produce a concise personality report based on lifetime Spotify stats. Aim for about ${length} words, use Gen Z slang and playful roasting that's kind (no insults, no profanity, no hate). Include ${bullets} punchy bullets with short, funny labels, varied structure and rhythm. Focus primarily on ${focusStr}. ${includeVerdict ? "End with a one-liner \"verdict\" tagline that feels memorable." : ""}`;
-  };
+  // Prompt is currently constructed in the client using selected tone.
 
   const onGenerate = async () => {
     setError(null);
