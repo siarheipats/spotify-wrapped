@@ -41,7 +41,7 @@ export function SkippingInsightsSection({ streams }: Props) {
           </Typography>
         </li>
         <li>
-          <Typography variant="body2">
+          <Typography variant="body2" sx={{ overflowWrap: "anywhere", wordBreak: "break-word" }}>
             Tracks you never skip: {skipping.neverSkippedTracks.slice(0, 5).map((t) => `${t.track}${t.artist ? ` — ${t.artist}` : ""}`).join(", ") || "none"}
             {skipping.neverSkippedTracks.length > 5 ? " …" : ""}
           </Typography>
