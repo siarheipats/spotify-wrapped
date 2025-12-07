@@ -15,11 +15,10 @@ export function HabitsSection({ byHour, byWeekday }: Props) {
       <Grid item xs={12} md={6}>
         <Paper sx={{ p: 2.5, borderRadius: 3, height: "100%" }}>
           <Typography variant="h6" gutterBottom>
-            Listening by hour of day (UTC)
+            Listening by hour of day
           </Typography>
           <Typography variant="body2" color="text.secondary" mb={2}>
             See which times of day you tend to listen the most.
-            (Currently using UTC; later we can shift to your timezone.)
           </Typography>
           <ListeningByHourChart data={byHour} />
         </Paper>

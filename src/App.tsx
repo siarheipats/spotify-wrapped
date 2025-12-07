@@ -1,9 +1,8 @@
 // src/App.tsx
 import { useState } from "react";
 import type { StreamRecord } from "./interfaces/interfaces";
-import JSZip from "jszip";
 
-// MUI 
+// MUI
 import { Box, Container, Typography, Grid, Alert, Backdrop, CircularProgress } from "@mui/material";
 
 // Components
@@ -39,8 +38,13 @@ import { computeGhostedArtists } from "./helpers/computeGhostedArtists";
 import { computeRepeatChampions } from "./helpers/computeRepeatChampions";
 import { computeClimbers } from "./helpers/computeClimbers";
 import { computeFrozenTracks } from "./helpers/computeFrozenTracks";
+import { computeFirstPlay } from "./helpers/computeFirstPlay";
+import { formatLocalDateTime } from "./helpers/formatLocalDateTime";
 import AIReportSection from "./components/AIReportSection";
 import { StoryHighlights } from "./components/StoryHighlights";
+
+// File Handling
+import { expandAndParseFiles } from "./fileHandlingClient";
 
 function App() {
   const [streams, setStreams] = useState<StreamRecord[]>([]);
@@ -66,70 +70,18 @@ function App() {
   const ghosted = computeGhostedArtists(streams, 2);
   const climbers = computeClimbers(streams);
   const frozen = computeFrozenTracks(streams);
+  const firstPlay = computeFirstPlay(streams);
 
   const parseFiles = async (files: File[]) => {
     setError(null);
     setLoading(true);
-
-    // Expand ZIP files into JSON files
-    const expandedFiles: File[] = [];
-    for (const file of files) {
-      const lower = file.name.toLowerCase();
-      if (lower.endsWith(".zip")) {
-        try {
-          const zip = await JSZip.loadAsync(file);
-          const entries = Object.values(zip.files).filter((f) => !f.dir && f.name.toLowerCase().endsWith(".json"));
-          for (const entry of entries) {
-            const content = await entry.async("string");
-            const blob = new Blob([content], { type: "application/json" });
-            const jsonFile = new File([blob], entry.name, { type: "application/json" });
-            expandedFiles.push(jsonFile);
-          }
-        } catch (e) {
-          console.error(e);
-          setError("Failed to read ZIP file. Ensure it contains JSON files.");
-        }
-      } else {
-        expandedFiles.push(file);
-      }
-    }
-
-    const jsonFiles = expandedFiles.filter((file) =>
-      file.name.toLowerCase().endsWith(".json"),
-    );
-
-    if (jsonFiles.length === 0) {
-      setError("No JSON files detected. Please drop .json files from Spotify.");
-      return;
-    }
-
     try {
-      const allRecords: StreamRecord[] = [];
-      const fileNames: string[] = [];
-
-      for (const file of jsonFiles) {
-        const text = await file.text();
-        const data = JSON.parse(text);
-
-        if (!Array.isArray(data)) {
-          console.warn(`File ${file.name} did not contain an array, skipping.`);
-          continue;
-        }
-
-        const withSource = data.map((item: any) => ({
-          ...item,
-          _source_file: file.name,
-        }));
-
-        allRecords.push(...(withSource as StreamRecord[]));
-        fileNames.push(file.name);
-      }
-
-      setStreams((prev) => [...prev, ...allRecords]);
+      const { records, fileNames } = await expandAndParseFiles(files);
+      setStreams((prev) => [...prev, ...records]);
       setFilesLoaded((prev) => [...prev, ...fileNames]);
-    } catch (err) {
-      console.error(err);
-      setError("Failed to parse one or more JSON files.");
+    } catch (e: any) {
+      console.error(e);
+      setError(e?.message || "Failed to parse one or more JSON files.");
     } finally {
       setLoading(false);
     }
@@ -195,6 +147,15 @@ function App() {
                 { label: "Total streams", value: stats.totalStreams },
                 { label: "Distinct artists", value: stats.distinctArtists },
                 { label: "Distinct tracks", value: stats.distinctTracks },
+                ...(firstPlay
+                  ? [
+                      {
+                        label: "First song played",
+                        value: firstPlay.track,
+                        subtitle: `${firstPlay.artist}${firstPlay.when ? ` · ${formatLocalDateTime(firstPlay.when)}` : ""}`,
+                      },
+                    ]
+                  : []),
               ]}
             />
 

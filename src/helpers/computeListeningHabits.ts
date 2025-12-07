@@ -5,9 +5,9 @@ export function computeListeningHabits(streams: StreamRecord[]): ListeningHabits
     return { byHour: [], byWeekday: [] };
   }
 
-  // group ms_played by hour-of-day (UTC)
+  // group ms_played by hour-of-day (Local timezone)
   const hourMap = new Map<number, number>();
-  // group ms_played by weekday (UTC)
+  // group ms_played by weekday (Local timezone)
   const weekdayMap = new Map<string, number>();
 
   const weekdayNames = [
@@ -26,8 +26,8 @@ export function computeListeningHabits(streams: StreamRecord[]): ListeningHabits
     const date = new Date(row.ts);
     if (isNaN(date.getTime())) continue;
 
-    const hour = date.getUTCHours(); // 0–23
-    const weekdayIndex = date.getUTCDay(); // 0 (Sun) – 6 (Sat)
+    const hour = date.getHours(); // 0–23 local
+    const weekdayIndex = date.getDay(); // 0 (Sun) – 6 (Sat) local
     const weekday = weekdayNames[weekdayIndex];
 
     const ms = row.ms_played ?? 0;
