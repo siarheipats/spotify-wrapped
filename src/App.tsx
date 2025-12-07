@@ -64,7 +64,7 @@ function App() {
   const podcastSplit = computeMusicPodcastSplit(streams);
   const topPodcastShows = computeTopPodcastShows(streams, 8);
   const topPodcastEpisodes = computeTopPodcastEpisodes(streams, 8);
-  const skipping = computeSkipping(streams);
+  const skipping = computeSkipping(streams); // retained for other uses; section will recompute with options
   const sessionStats = computeSessions(streams, 30);
   const foreverTop = computeForeverTop10(streams, 10);
   const champions = computeRepeatChampions(streams);
@@ -215,7 +215,7 @@ function App() {
 
             {/* Skipping behavior */}
             <Box mb={3}>
-              <SkippingInsightsSection skipping={skipping} />
+              <SkippingInsightsSection streams={streams} />
             </Box>
 
             {/* Session analysis */}

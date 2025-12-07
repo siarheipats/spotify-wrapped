@@ -1,7 +1,14 @@
 import type { StreamRecord, SkipAnalytics } from "../interfaces/interfaces";
 import { isPodcast } from "./commonHelpers";
 
-export function computeSkipping(streams: StreamRecord[]): SkipAnalytics {
+export interface SkipOptions {
+  useFlagPreferentially?: boolean; // use r.skipped when present; fallback to threshold
+  thresholdMs?: number; // plays shorter than this considered skipped when flag missing
+  useLocalYear?: boolean; // use local timezone year grouping
+}
+
+export function computeSkipping(streams: StreamRecord[], options: SkipOptions = {}): SkipAnalytics {
+  const { useFlagPreferentially = true, thresholdMs = 30000, useLocalYear = false } = options;
   const trackKey = (r: StreamRecord) => {
     const t = r.master_metadata_track_name || "";
     const a = r.master_metadata_album_artist_name || "";
@@ -20,8 +27,11 @@ export function computeSkipping(streams: StreamRecord[]): SkipAnalytics {
     const key = trackKey(r);
     const track = r.master_metadata_track_name || "";
     const artist = r.master_metadata_album_artist_name || undefined;
-    const skipped = !!r.skipped;
     const ms = r.ms_played ?? 0;
+    const hasFlag = typeof (r as any).skipped !== "undefined";
+    const flagged = !!(r as any).skipped;
+    const heuristic = ms > 0 && ms < thresholdMs;
+    const skipped = useFlagPreferentially ? (hasFlag ? flagged : heuristic) : heuristic;
     totalTracks += 1;
     if (skipped) {
       skippedTracks += 1;
@@ -33,7 +43,8 @@ export function computeSkipping(streams: StreamRecord[]): SkipAnalytics {
     }
     // year
     if (r.ts) {
-      const y = new Date(r.ts).getUTCFullYear();
+      const d = new Date(r.ts);
+      const y = useLocalYear ? d.getFullYear() : d.getUTCFullYear();
       const curr = yearCounts.get(y) ?? { total: 0, skipped: 0 };
       curr.total += 1;
       curr.skipped += skipped ? 1 : 0;
