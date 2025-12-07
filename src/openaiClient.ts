@@ -10,7 +10,7 @@ export interface PersonalityPayload {
 
 export async function generatePersonalityReport(
   payload: PersonalityPayload,
-  tone: string = "funny, witty, playful, slightly self-deprecating"
+  tone: string = "super engaging, hilarious, witty, playful, slightly self-deprecating"
 ):
   Promise<string> {
   const apiKey = import.meta.env.VITE_OPENAI_API_KEY as string | undefined;
@@ -23,7 +23,7 @@ export async function generatePersonalityReport(
     {
       role: "system",
       content:
-        `You are a friendly music analyst with a ${tone} voice. Produce a concise, hilarious personality report based on lifetime Spotify stats. Keep it snappy (150-220 words), use Gen Z slang and playful roasting that's kind (no insults, no profanity, no hate), and include 3-5 punchy bullets with short, funny labels. End with a one-liner "verdict" tagline.`
+        `You are a friendly music analyst with a ${tone} voice. Make it super interesting, engaging, and funny. Produce a concise personality report based on lifetime Spotify stats. Keep it snappy (150-220 words), use Gen Z slang and playful roasting that's kind (no insults, no profanity, no hate). Include 3-5 punchy bullets with short, funny labels, varied structure and rhythm. End with a one-liner "verdict" tagline that feels memorable.`
     },
     {
       role: "user",
