@@ -18,6 +18,7 @@ import { PodcastInsightsSection } from "./components/PodcastInsightsSection";
 import { SkippingInsightsSection } from "./components/SkippingInsightsSection";
 import { SessionInsightsSection } from "./components/SessionInsightsSection";
 import { ArtistTrackInsightsSection } from "./components/ArtistTrackInsightsSection";
+import { DateRangeStatsSection } from "./components/DateRangeStatsSection";
 
 // Helpers
 import { computeBasicStats } from "./helpers/computeBasicStats";
@@ -171,6 +172,11 @@ function App() {
               <ListeningTimelineSection data={stats.listeningByYear} />
             </Grid>
             <br/>
+
+            {/* Date range insights */}
+            <Box mb={3}>
+              <DateRangeStatsSection streams={streams} />
+            </Box>
 
             {/* Top Artists */}
             {topArtists.length > 0 && (
