@@ -49,9 +49,9 @@ function App() {
   const [loading, setLoading] = useState<boolean>(false);
 
   const stats = computeBasicStats(streams);
-  const topArtists = computeTopArtists(streams, 10);
+  const topArtists = computeTopArtists(streams, 30);
   const habits = computeListeningHabits(streams);
-  const topTracks = computeTopTracks(streams, 10);
+  const topTracks = computeTopTracks(streams, 30);
   const personality = stats.totalStreams > 0 ? computePersonality(stats, habits, topArtists) : null;
   const eras = stats.totalStreams > 0 ? computeEras(stats, streams) : [];
   const milestones = stats.totalStreams > 0 ? computeMilestones(stats, streams) : [];

@@ -32,9 +32,11 @@ export function TopArtistsChart({ data }: Props) {
 
   // We reverse to show top at the top in a horizontal bar chart
   const displayData = [...data].reverse();
+  const rowHeight = 26; // px per row to keep labels readable
+  const chartHeight = Math.max(240, Math.min(rowHeight * displayData.length, 1000));
 
   return (
-    <ResponsiveContainer width="100%" height={360}>
+    <ResponsiveContainer width="100%" height={chartHeight}>
       <BarChart
         data={displayData}
         layout="vertical"
@@ -47,7 +49,9 @@ export function TopArtistsChart({ data }: Props) {
         <YAxis
           type="category"
           dataKey="artist"
-          width={180}
+          width={220}
+          interval={0}
+          tick={{ fontSize: 12 }}
         />
         <Tooltip
           formatter={(value: any, name: any, _props: any) => {

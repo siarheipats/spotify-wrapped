@@ -39,8 +39,11 @@ export function TopTracksChart({ data }: Props) {
     label: `${row.track} — ${row.artist}`,
   }));
 
+  const rowHeight = 26; // px per row
+  const chartHeight = Math.max(240, Math.min(rowHeight * formatted.length, 1000));
+
   return (
-    <ResponsiveContainer width="100%" height={360}>
+    <ResponsiveContainer width="100%" height={chartHeight}>
       <BarChart
         data={formatted}
         layout="vertical"
@@ -53,7 +56,9 @@ export function TopTracksChart({ data }: Props) {
         <YAxis
           type="category"
           dataKey="label"
-          width={260}
+          width={300}
+          interval={0}
+          tick={{ fontSize: 12 }}
         />
         <Tooltip
           formatter={(value: any, name: any) => {
