@@ -1,7 +1,7 @@
 import { Paper, Typography, Grid } from "@mui/material";
 import { ListeningByHourChart } from "./ListeningByHourChart";
 import { ListeningByWeekdayChart } from "./ListeningByWeekdayChart";
-import type { ListeningByHourRow, ListeningByWeekdayRow } from "../stats";
+import type { ListeningByHourRow, ListeningByWeekdayRow } from "../interfaces/interfaces"
 
 interface Props {
   byHour: ListeningByHourRow[];

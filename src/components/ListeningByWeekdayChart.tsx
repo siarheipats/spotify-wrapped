@@ -8,7 +8,7 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
-import type { ListeningByWeekdayRow } from "../stats";
+import type { ListeningByWeekdayRow } from "../interfaces/interfaces";
 
 interface Props {
   data: ListeningByWeekdayRow[];

@@ -8,7 +8,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
-import type { TopArtistRow } from "../stats";
+import type { TopArtistRow } from "../interfaces/interfaces";
 
 interface Props {
   data: TopArtistRow[];

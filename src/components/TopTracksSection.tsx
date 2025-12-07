@@ -1,6 +1,6 @@
 import { Box, Chip, Paper, Typography } from "@mui/material";
 import { TopTracksChart } from "./TopTracksChart";
-import type { TopTrackRow } from "../stats";
+import type { TopTrackRow } from "../interfaces/interfaces";
 
 interface Props {
   data: TopTrackRow[];

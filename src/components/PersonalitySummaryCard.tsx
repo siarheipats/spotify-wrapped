@@ -1,5 +1,5 @@
 import { Box, Chip, Paper, Typography } from "@mui/material";
-import type { PersonalitySummary } from "../stats";
+import type { PersonalitySummary } from "../interfaces/interfaces";
 
 interface Props {
   personality: PersonalitySummary;

@@ -1,6 +1,6 @@
 // src/components/StoryHighlights.tsx
 import { Box, Chip, Paper, Typography, Grid, Divider } from "@mui/material";
-import type { EraChapter, Milestone, Badge } from "../stats";
+import type { EraChapter, Milestone, Badge } from "../interfaces/interfaces";
 
 interface Props {
   eras: EraChapter[];

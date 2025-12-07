@@ -8,7 +8,7 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from "recharts";
-import type { ListeningByHourRow } from "../stats";
+import type { ListeningByHourRow } from "../interfaces/interfaces"
 
 interface Props {
   data: ListeningByHourRow[];

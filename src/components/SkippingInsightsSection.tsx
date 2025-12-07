@@ -1,5 +1,5 @@
 import { Box, Paper, Typography } from "@mui/material";
-import type { SkipAnalytics } from "../analytics";
+import type { SkipAnalytics } from "../interfaces/interfaces"
 
 interface Props {
   skipping: SkipAnalytics;

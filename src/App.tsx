@@ -1,11 +1,12 @@
 // src/App.tsx
 import { useState } from "react";
-import type { StreamRecord } from "./spotifyTypes";
+import type { StreamRecord } from "./interfaces/interfaces";
 import JSZip from "jszip";
-import { computeBasicStats, computeTopArtists, computeListeningHabits, computeTopTracks, computePersonality, computeEras, computeMilestones, computeBadges } from "./stats";
 
+// MUI 
 import { Box, Container, Typography, Grid, Alert, Backdrop, CircularProgress } from "@mui/material";
 
+// Components
 import { ListeningTimelineSection } from "./components/ListeningTimelineSection";
 import { TopArtistsSection } from "./components/TopArtistsSection";
 import { HabitsSection } from "./components/HabitsSection";
@@ -18,8 +19,27 @@ import { PodcastInsightsSection } from "./components/PodcastInsightsSection";
 import { SkippingInsightsSection } from "./components/SkippingInsightsSection";
 import { SessionInsightsSection } from "./components/SessionInsightsSection";
 import { ArtistTrackInsightsSection } from "./components/ArtistTrackInsightsSection";
+
+// Helpers
+import { computeBasicStats } from "./helpers/computeBasicStats";
+import { computeListeningHabits } from "./helpers/computeListeningHabits";
+import { computeTopArtists } from "./helpers/computeTopArtists";
+import { computeTopTracks } from "./helpers/computeTopTracks";
+import { computePersonality } from "./helpers/computePersonality";
+import { computeEras } from "./helpers/computeEras";
+import { computeMilestones } from "./helpers/computeMilestones";
+import { computeBadges } from "./helpers/computeBadges";
+import { computeMusicPodcastSplit } from "./helpers/computeMusicPodcastSplit";
+import { computeTopPodcastShows } from "./helpers/computeTopPodcastShows";
+import { computeTopPodcastEpisodes } from "./helpers/computeTopPodcastEpisodes";
+import { computeSkipping } from "./helpers/computeScipping";
+import { computeSessions } from "./helpers/computeSessions";
+import { computeForeverTop10 } from "./helpers/computeForeverTop10";
+import { computeGhostedArtists } from "./helpers/computeGhostedArtists";
+import { computeRepeatChampions } from "./helpers/computeRepeatChampions";
+import { computeClimbers } from "./helpers/computeClimbers";
+import { computeFrozenTracks } from "./helpers/computeFrozenTracks";
 import AIReportSection from "./components/AIReportSection";
-import { computeMusicPodcastSplit, computeTopPodcastShows, computeTopPodcastEpisodes, computeSkipping, computeSessions, computeForeverTop10, computeRepeatChampions, computeGhostedArtists, computeClimbers, computeFrozenTracks } from "./analytics";
 import { StoryHighlights } from "./components/StoryHighlights";
 
 function App() {
@@ -161,6 +181,11 @@ function App() {
         {/* Only show stats if we have data */}
         {stats.totalStreams > 0 && (
           <>
+            <Grid item xs={12} md={4}>
+                <DataLoadedPanel filesLoaded={filesLoaded} firstTs={stats.firstTs} lastTs={stats.lastTs} />
+            </Grid>
+            <br/>
+
             {/* Personality summary */}
             {personality && <PersonalitySummaryCard personality={personality} />}
             {/* Top stats row */}
@@ -173,24 +198,18 @@ function App() {
               ]}
             />
 
-            {/* File list + core dates */}
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={4}>
-                <DataLoadedPanel filesLoaded={filesLoaded} firstTs={stats.firstTs} lastTs={stats.lastTs} />
-              </Grid>
-
-              {/* Chart */}
-              <Grid item xs={12} md={8}>
-                <ListeningTimelineSection data={stats.listeningByYear} />
-              </Grid>
-            </Grid>
-            <br/>
             {/* AI Personality Report */}
             {(topArtists.length > 0 || topTracks.length > 0) && (
               <Box mb={3}>
                 <AIReportSection stats={stats} habits={habits} topArtists={topArtists} topTracks={topTracks} />
               </Box>
             )}
+
+            {/* Chart */}
+            <Grid>
+              <ListeningTimelineSection data={stats.listeningByYear} />
+            </Grid>
+            <br/>
 
             {/* Storytelling: eras, milestones, badges */}
             {(eras.length > 0 || milestones.length > 0 || badges.length > 0) && (

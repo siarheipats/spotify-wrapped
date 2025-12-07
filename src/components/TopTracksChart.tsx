@@ -8,7 +8,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
-import type { TopTrackRow } from "../stats";
+import type { TopTrackRow } from "../interfaces/interfaces";
 
 interface Props {
   data: TopTrackRow[];

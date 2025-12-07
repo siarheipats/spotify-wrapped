@@ -1,5 +1,5 @@
 import { Box, Paper, Typography, Grid, Tooltip } from "@mui/material";
-import type { ForeverTop10, RepeatChampions, GhostedArtistRow, ClimbersRow, FrozenTrackRow } from "../analytics";
+import type { ForeverTop10, RepeatChampions, GhostedArtistRow, ClimbersRow, FrozenTrackRow } from "../interfaces/interfaces";
 
 interface Props {
   foreverTop: ForeverTop10;

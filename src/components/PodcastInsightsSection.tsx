@@ -1,5 +1,5 @@
 import { Box, Chip, Paper, Typography, Grid } from "@mui/material";
-import type { TopPodcastShowRow, TopPodcastEpisodeRow, MusicPodcastSplit } from "../analytics";
+import type { TopPodcastShowRow, TopPodcastEpisodeRow, MusicPodcastSplit } from "../interfaces/interfaces";
 
 interface Props {
   split: MusicPodcastSplit;

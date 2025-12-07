@@ -1,5 +1,5 @@
 import { Box, Paper, Typography } from "@mui/material";
-import type { SessionStats } from "../analytics";
+import type { SessionStats } from "../interfaces/interfaces"
 
 interface Props { stats: SessionStats }
 
