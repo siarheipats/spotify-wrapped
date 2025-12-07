@@ -32,7 +32,6 @@ import { computeBadges } from "./helpers/computeBadges";
 import { computeMusicPodcastSplit } from "./helpers/computeMusicPodcastSplit";
 import { computeTopPodcastShows } from "./helpers/computeTopPodcastShows";
 import { computeTopPodcastEpisodes } from "./helpers/computeTopPodcastEpisodes";
-import { computeSkipping } from "./helpers/computeScipping";
 import { computeSessions } from "./helpers/computeSessions";
 import { computeForeverTop10 } from "./helpers/computeForeverTop10";
 import { computeGhostedArtists } from "./helpers/computeGhostedArtists";
@@ -64,7 +63,6 @@ function App() {
   const podcastSplit = computeMusicPodcastSplit(streams);
   const topPodcastShows = computeTopPodcastShows(streams, 8);
   const topPodcastEpisodes = computeTopPodcastEpisodes(streams, 8);
-  const skipping = computeSkipping(streams); // retained for other uses; section will recompute with options
   const sessionStats = computeSessions(streams, 30);
   const foreverTop = computeForeverTop10(streams, 10);
   const champions = computeRepeatChampions(streams);
