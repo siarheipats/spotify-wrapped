@@ -41,7 +41,6 @@ export function ListeningHeatmapSection({ streams }: Props) {
   const [selectedYear, setSelectedYear] = useState<string>(() => (years.length ? years[years.length - 1] : ""));
   const [openDay, setOpenDay] = useState<string | null>(null);
   const [artistImageCache] = useState<Map<string, string>>(new Map());
-  const [imagesVersion, setImagesVersion] = useState(0);
   const [imagesLoading, setImagesLoading] = useState(false);
 
   // Compute unique artists for the currently open day (if any)
@@ -71,7 +70,6 @@ export function ListeningHeatmapSection({ streams }: Props) {
           if (url) artistImageCache.set(name, url);
         } catch { /* noop */ }
       }));
-      if (!cancelled) setImagesVersion((v) => v + 1);
       if (!cancelled) setImagesLoading(false);
     })();
     return () => { cancelled = true; };
