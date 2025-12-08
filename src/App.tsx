@@ -20,7 +20,6 @@ import { SessionInsightsSection } from "./components/SessionInsightsSection";
 import { ArtistTrackInsightsSection } from "./components/ArtistTrackInsightsSection";
 import { DateRangeStatsSection } from "./components/DateRangeStatsSection";
 import { ListeningHeatmapSection } from "./components/ListeningHeatmapSection";
-import ObsessiveLoopsSection from "./components/ObsessiveLoopsSection";
 
 // Helpers
 import { computeBasicStats } from "./helpers/computeBasicStats";

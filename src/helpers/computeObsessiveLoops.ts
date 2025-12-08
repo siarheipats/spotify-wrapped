@@ -41,25 +41,26 @@ export function computeObsessiveLoops(streams: StreamRecord[], options?: LoopOpt
   const perTrack = new Map<string, { track: string; artist: string; days: Map<string, number>; months: Map<string, number>; weeks: Map<string, number> }>();
 
   for (const s of streams) {
-    const t = s.trackName ?? s.track ?? s.master_metadata_track_name;
-    const a = s.artistName ?? s.artist ?? s.master_metadata_album_artist_name;
+    const t = (s as any).trackName ?? (s as any).track ?? (s as any).master_metadata_track_name;
+    const a = (s as any).artistName ?? (s as any).artist ?? (s as any).master_metadata_album_artist_name;
     if (!t) continue;
-    const time = s.ts ?? s.endTime ?? s.startTime ?? s.timestamp;
-    const d = new Date(time);
+    const time = (s as any).ts ?? (s as any).endTime ?? (s as any).startTime ?? (s as any).timestamp;
+    const d = new Date(typeof time === "string" || typeof time === "number" || time instanceof Date ? time : NaN);
     if (Number.isNaN(d.getTime())) continue;
 
     const key = `${t}|||${a ?? ""}`;
     let agg = perTrack.get(key);
     if (!agg) {
-      agg = { track: t, artist: a ?? "Unknown Artist", days: new Map(), months: new Map(), weeks: new Map() };
-      perTrack.set(key, agg);
+      const newAgg = { track: String(t), artist: String(a ?? "Unknown Artist"), days: new Map<string, number>(), months: new Map<string, number>(), weeks: new Map<string, number>() };
+      perTrack.set(key, newAgg);
+      agg = newAgg;
     }
     const dk = dateKey(d);
-    agg.days.set(dk, (agg.days.get(dk) ?? 0) + 1);
+    agg!.days.set(dk, (agg!.days.get(dk) ?? 0) + 1);
     const mk = monthKey(d);
-    agg.months.set(mk, (agg.months.get(mk) ?? 0) + 1);
+    agg!.months.set(mk, (agg!.months.get(mk) ?? 0) + 1);
     const wk = weekKey(d);
-    agg.weeks.set(wk, (agg.weeks.get(wk) ?? 0) + 1);
+    agg!.weeks.set(wk, (agg!.weeks.get(wk) ?? 0) + 1);
   }
 
   const results: Obsession[] = [];
@@ -85,10 +86,10 @@ export function computeObsessiveLoops(streams: StreamRecord[], options?: LoopOpt
         prevYearWeek = { year: yr, week: w };
         total = plays;
       } else {
-        const expectedWeek = (prevYearWeek!.week + 1);
-        const advancesYear = expectedWeek > 52;
-        const nextYear = advancesYear ? prevYearWeek!.year + 1 : prevYearWeek!.year;
-        const nextWeek = advancesYear ? 0 : expectedWeek;
+        const expectedWeek: number = (prevYearWeek!.week + 1);
+        const advancesYear: boolean = expectedWeek > 52;
+        const nextYear: number = advancesYear ? prevYearWeek!.year + 1 : prevYearWeek!.year;
+        const nextWeek: number = advancesYear ? 0 : expectedWeek;
         if (yr === nextYear && w === nextWeek) {
           prevYearWeek = { year: yr, week: w };
           total += plays;

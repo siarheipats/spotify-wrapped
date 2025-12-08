@@ -170,18 +170,21 @@ export function ListeningHeatmapSection({ streams }: Props) {
             (() => {
               const items = streams.filter((s) => {
                 // Normalize to local date string YYYY-MM-DD
-                const d = new Date(s.ts ?? s.endTime ?? s.startTime ?? s.timestamp);
+                const raw = (s as any).ts ?? (s as any).endTime ?? (s as any).startTime ?? (s as any).timestamp;
+                const d = new Date(typeof raw === "string" || typeof raw === "number" || raw instanceof Date ? raw : NaN);
                 if (Number.isNaN(d.getTime())) return false;
                 const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
                 return key === openDay;
               });
               // Sort by time if available
               items.sort((a, b) => {
-                const da = new Date(a.ts ?? a.endTime ?? a.startTime ?? a.timestamp).getTime();
-                const db = new Date(b.ts ?? b.endTime ?? b.startTime ?? b.timestamp).getTime();
+                const ra = (a as any).ts ?? (a as any).endTime ?? (a as any).startTime ?? (a as any).timestamp;
+                const rb = (b as any).ts ?? (b as any).endTime ?? (b as any).startTime ?? (b as any).timestamp;
+                const da = new Date(typeof ra === "string" || typeof ra === "number" || ra instanceof Date ? ra : NaN).getTime();
+                const db = new Date(typeof rb === "string" || typeof rb === "number" || rb instanceof Date ? rb : NaN).getTime();
                 return da - db;
               });
-              const totalMs = items.reduce((acc, s) => acc + (s.msPlayed ?? s.ms_played ?? 0), 0);
+              const totalMs = items.reduce((acc, s) => acc + Number((s as any).msPlayed ?? (s as any).ms_played ?? 0), 0);
               const totalHours = totalMs / 1000 / 60 / 60;
               const totalMinutes = Math.round(totalMs / 1000 / 60);
               return (
@@ -192,9 +195,9 @@ export function ListeningHeatmapSection({ streams }: Props) {
                   {items.length ? (
                     <List dense>
                       {items.map((s, idx) => {
-                        const minutes = Math.round((s.msPlayed ?? s.ms_played ?? 0) / 1000 / 60);
-                        const primary = s.trackName ?? s.track ?? s.master_metadata_track_name ?? "Unknown Track";
-                        const artist = s.artistName ?? s.artist ?? s.master_metadata_album_artist_name ?? "Unknown Artist";
+                        const minutes = Math.round(Number((s as any).msPlayed ?? (s as any).ms_played ?? 0) / 1000 / 60);
+                        const primary = (s as any).trackName ?? (s as any).track ?? (s as any).master_metadata_track_name ?? "Unknown Track";
+                        const artist = (s as any).artistName ?? (s as any).artist ?? (s as any).master_metadata_album_artist_name ?? "Unknown Artist";
                         return (
                           <ListItem key={idx} disableGutters>
                             <ListItemText
