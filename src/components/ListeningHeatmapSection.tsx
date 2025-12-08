@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react";
-import { Box, Paper, Typography, FormControl, InputLabel, Select, MenuItem, Tooltip, Dialog, DialogTitle, DialogContent, List, ListItem, ListItemText, Button } from "@mui/material";
+import { useMemo, useState, useEffect } from "react";
+import { Box, Paper, Typography, FormControl, InputLabel, Select, MenuItem, Tooltip, Dialog, DialogTitle, DialogContent, List, ListItem, ListItemText, Button, Avatar, CircularProgress } from "@mui/material";
+import { getArtistImageByName } from "../clients/spotifyClient";
 import type { StreamRecord } from "../interfaces/interfaces";
 import { computeListeningByDay } from "../helpers/computeListeningByDay";
 
@@ -39,6 +40,42 @@ export function ListeningHeatmapSection({ streams }: Props) {
   }, [days]);
   const [selectedYear, setSelectedYear] = useState<string>(() => (years.length ? years[years.length - 1] : ""));
   const [openDay, setOpenDay] = useState<string | null>(null);
+  const [artistImageCache] = useState<Map<string, string>>(new Map());
+  const [imagesVersion, setImagesVersion] = useState(0);
+  const [imagesLoading, setImagesLoading] = useState(false);
+
+  // Compute unique artists for the currently open day (if any)
+  const uniqueArtistsForOpenDay = useMemo(() => {
+    if (!openDay) return [] as string[];
+    const items = streams.filter((s) => {
+      const raw = (s as any).ts ?? (s as any).endTime ?? (s as any).startTime ?? (s as any).timestamp;
+      const d = new Date(typeof raw === "string" || typeof raw === "number" || raw instanceof Date ? raw : NaN);
+      if (Number.isNaN(d.getTime())) return false;
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      return key === openDay;
+    });
+    const names = items.map((s) => ((s as any).artistName ?? (s as any).artist ?? (s as any).master_metadata_album_artist_name ?? "Unknown Artist") as string);
+    return Array.from(new Set(names)).filter((a) => !!a && a !== "Unknown Artist");
+  }, [streams, openDay]);
+
+  // Prefetch images when a day opens (and trigger a re-render once done)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setImagesLoading(true);
+      const toFetch = uniqueArtistsForOpenDay.filter((n) => !artistImageCache.has(n)).slice(0, 10);
+      if (toFetch.length === 0) return;
+      await Promise.all(toFetch.map(async (name) => {
+        try {
+          const url = await getArtistImageByName(name);
+          if (url) artistImageCache.set(name, url);
+        } catch { /* noop */ }
+      }));
+      if (!cancelled) setImagesVersion((v) => v + 1);
+      if (!cancelled) setImagesLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, [uniqueArtistsForOpenDay]);
   // Ensure selectedYear stays valid when data changes
   if (selectedYear && years.length && !years.includes(selectedYear)) {
     // pick latest year
@@ -187,6 +224,7 @@ export function ListeningHeatmapSection({ streams }: Props) {
               const totalMs = items.reduce((acc, s) => acc + Number((s as any).msPlayed ?? (s as any).ms_played ?? 0), 0);
               const totalHours = totalMs / 1000 / 60 / 60;
               const totalMinutes = Math.round(totalMs / 1000 / 60);
+              // Image prefetch handled by top-level useEffect
               return (
                 <Box>
                   <Typography variant="body2" color="text.secondary" mb={1}>
@@ -198,8 +236,18 @@ export function ListeningHeatmapSection({ streams }: Props) {
                         const minutes = Math.round(Number((s as any).msPlayed ?? (s as any).ms_played ?? 0) / 1000 / 60);
                         const primary = (s as any).trackName ?? (s as any).track ?? (s as any).master_metadata_track_name ?? "Unknown Track";
                         const artist = (s as any).artistName ?? (s as any).artist ?? (s as any).master_metadata_album_artist_name ?? "Unknown Artist";
+                        const imgUrl = artistImageCache.get(artist);
                         return (
                           <ListItem key={idx} disableGutters>
+                            {imagesLoading ? (
+                              <CircularProgress size={28} sx={{ mr: 1 }} />
+                            ) : imgUrl ? (
+                              <Avatar src={imgUrl} alt={artist} sx={{ width: 40, height: 40, mr: 1 }} />
+                            ) : (
+                              <Avatar sx={{ width: 40, height: 40, mr: 1 }}>
+                                {(artist || "?").slice(0,1)}
+                              </Avatar>
+                            )}
                             <ListItemText
                               primary={`${primary}`}
                               secondary={`${artist} • ${minutes} min`}
