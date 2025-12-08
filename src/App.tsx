@@ -19,6 +19,8 @@ import { SkippingInsightsSection } from "./components/SkippingInsightsSection";
 import { SessionInsightsSection } from "./components/SessionInsightsSection";
 import { ArtistTrackInsightsSection } from "./components/ArtistTrackInsightsSection";
 import { DateRangeStatsSection } from "./components/DateRangeStatsSection";
+import { ListeningHeatmapSection } from "./components/ListeningHeatmapSection";
+import ObsessiveLoopsSection from "./components/ObsessiveLoopsSection";
 
 // Helpers
 import { computeBasicStats } from "./helpers/computeBasicStats";
@@ -173,6 +175,13 @@ function App() {
               <ListeningTimelineSection data={stats.listeningByYear} />
             </Grid>
             <br/>
+
+            {/* Heatmap */}
+            <Box mb={3}>
+              <ListeningHeatmapSection streams={streams} />
+              {/* TODO: Need some work on this component */}
+              {/* <ObsessiveLoopsSection streams={streams} /> */}
+            </Box>
 
             {/* Date range insights */}
             <Box mb={3}>
