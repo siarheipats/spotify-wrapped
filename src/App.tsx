@@ -20,6 +20,7 @@ import { SessionInsightsSection } from "./components/SessionInsightsSection";
 import { ArtistTrackInsightsSection } from "./components/ArtistTrackInsightsSection";
 import { DateRangeStatsSection } from "./components/DateRangeStatsSection";
 import { ListeningHeatmapSection } from "./components/ListeningHeatmapSection";
+import  ArtistMonthlyPlaysChart from "./components/ArtistMonthlyPlaysChart";
 
 // Helpers
 import { computeBasicStats } from "./helpers/computeBasicStats";
@@ -172,6 +173,15 @@ function App() {
             {/* Chart */}
             <Grid>
               <ListeningTimelineSection data={stats.listeningByYear} />
+            </Grid>
+            <br/>
+
+            <Grid>
+              <ArtistMonthlyPlaysChart
+                streams={streams}
+                defaultArtist={topArtists[0]?.artist ?? null}
+                fallbackOptions={topArtists.map(a => a.artist)}
+              />
             </Grid>
             <br/>
 
